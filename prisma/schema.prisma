@@ -1,0 +1,214 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model userdata_tb {
+  username            String?   @db.VarChar(72)
+  password            String    @db.VarChar(100)
+  role_id             String    @db.VarChar(36)
+  role_name           String?   @db.VarChar(36)
+  firstname           String    @db.VarChar(60)
+  lastname            String?   @db.VarChar(60)
+  business_name       String?
+  dob                 DateTime? @db.DateTime(0)
+  confirm_pin         String?   @db.VarChar(8)
+  email               String    @unique(map: "email") @db.VarChar(100)
+  mobile_phone        String?   @default("000 000 0000") @db.VarChar(20)
+  address             String?
+  passchg_logon       String?   @db.Char(1)
+  pass_expire         String?   @default("") @db.VarChar(1)
+  pass_dateexpire     DateTime? @db.DateTime(0)
+  pass_change         String?   @db.Char(1)
+  user_disabled       String?   @default("0") @db.Char(1)
+  user_locked         String?   @default("0") @db.Char(1)
+  last_seen           String?   @db.VarChar(32)
+  day_1               String?   @default("1") @db.Char(1)
+  ID_Image_url        String?   @default("1") @db.Char(1)
+  id_number           String?   @default("1") @db.Char(1)
+  org_name            String?   @db.VarChar(128)
+  means_of_ID         String?   @default("1") @db.Char(1)
+  city                String?   @default("1") @db.Char(1)
+  state               String?   @default("1") @db.Char(1)
+  nationality         String?   @default("1") @db.Char(1)
+  pin_missed          Int?      @default(0)
+  last_used           DateTime? @db.DateTime(0)
+  modified            DateTime? @db.DateTime(0)
+  hint_question       String?   @db.VarChar(100)
+  hint_answer         String?   @db.VarChar(100)
+  override_wh         String?   @db.Char(1)
+  extend_wh           String?   @db.VarChar(17)
+  created             DateTime? @db.DateTime(0)
+  posted_user         String?   @db.VarChar(100)
+  last_used_passwords String?   @db.VarChar(250)
+  confirm_code        String?   @db.VarChar(128)
+  confirm_account     String?   @default("0") @db.VarChar(1)
+  business_status     String    @default("NotVerified")
+  user_id             String    @unique(map: "user_id") @db.VarChar(128)
+  passport            String?   @db.VarChar(255)
+  referral_code       String?   @db.VarChar(16)
+  status              Int?      @default(1)
+  merchantId          String    @default(uuid()) @db.Char(36)
+  waddress            String?   @default("") @db.VarChar(128)
+  app                 String?   @db.VarChar(16)
+  email_auth          Int?      @default(0)
+  resetpassword       String?   @db.VarChar(128)
+  resettime           DateTime? @db.DateTime(0)
+  team_id             String?   @db.Char(36)
+  country             String?   @default("") @db.VarChar(36)
+  last_activity       DateTime? @db.DateTime(0)
+  otp_enabled         String?   @default("0") @db.VarChar(1)
+  otp_verified        String?   @db.VarChar(12)
+  otp_ascii           String?   @db.VarChar(128)
+  otp_hex             String?   @db.VarChar(128)
+  otp_base32          String?   @db.VarChar(128)
+  otp_auth_url        String?   @db.VarChar(256)
+  profilePic          String?
+  pk_live             String?   @db.VarChar(72)
+  sk_live             String?   @db.VarChar(72)
+  pk_test             String?   @db.VarChar(36)
+  sk_test             String?   @db.VarChar(36)
+  isExpired           Boolean   @default(false)
+  webhook_url         String?
+  secret_key          String?
+  blacklist           String?   @default("False")
+}
+
+model account_details_tb {
+  account_id  String @id @db.Char(20)
+  private_key String
+  public_key  String
+
+  created DateTime @default(now())
+}
+
+model transactions_tb {
+  transaction_id           String    @id @default("0") @db.VarChar(128)
+  fiat_id                  String?   @db.VarChar(36)
+  source_acct              String?   @db.VarChar(100)
+  destination_acct         String?   @db.VarChar(100)
+  trans_type               String?   @db.VarChar(50)
+  transaction_desc         String?   @db.Text
+  transaction_amount       Decimal?  @db.Decimal(50, 2)
+  response_code            String?   @db.VarChar(100)
+  payment_mode             String?   @db.VarChar(50)
+  initial_balance          Decimal?  @db.Decimal(50, 2)
+  current_balance          Decimal?  @db.Decimal(50, 2)
+  receiver_initial_balance Decimal?  @db.Decimal(50, 4)
+  receiver_current_balance Decimal?  @db.Decimal(50, 4)
+  posted_ip                String?   @db.VarChar(50)
+  created                  String?   @db.VarChar(32)
+  customer_id              String?
+  posted_user              String?   @db.VarChar(100)
+  merchant_category        String?   @db.VarChar(4)
+  settlement_status        Int?      @default(0)
+  order_id                 String?   @unique(map: "OrderIDIndex") @db.VarChar(200)
+  category                 String?   @db.VarChar(16)
+  session_id               String?   @db.VarChar(200)
+  xml_data                 String?   @db.Text
+  tranx_desc               String?   @db.VarChar(200)
+  debit_flag               Int?
+  debit_flag_date          DateTime? @db.Date
+  reversal_flag            Int?
+  reversal_flag_date       DateTime? @db.Date
+  trans_query_id           String?   @db.VarChar(128)
+  merchant_commission      Decimal?  @db.Decimal(50, 2)
+  chargefee                Decimal?  @db.Decimal(50, 2)
+  net_debit_amount         Decimal?  @db.Decimal(50, 2)
+  card_id                  Int?
+  response_message         String?   @db.VarChar(100)
+  charge_currency          String?   @db.VarChar(10)
+  disburse_currency        String?   @db.VarChar(10)
+  exchange_rate            Decimal?  @db.Decimal(2, 0)
+  archived                 Int?
+  btc_value_supplied       Decimal?  @db.Decimal(50, 20)
+  btc_response             Int?
+  btc_address              String?   @db.VarChar(90)
+  transaction_hash         String?   @db.VarChar(50)
+  btc_time_exceeded        Int?
+  created_btc              DateTime? @db.DateTime(0)
+  btc_value_received       Decimal?  @db.Decimal(50, 15)
+  btc_value_diff           Int?
+  gateway_response_message String?   @db.VarChar(250)
+  voucher_fee              Decimal?  @db.Decimal(2, 0)
+  gateway_fee              Decimal?  @db.Decimal(2, 0)
+  client_phone             String?   @db.VarChar(50)
+  payment_gateway          String?   @db.VarChar(80)
+  tokenize                 Int?
+  user_id                  String    @db.VarChar(64)
+  dev_id                   String?   @db.VarChar(64)
+  month                    String?   @db.VarChar(12)
+  recipient_name           String?   @db.VarChar(72)
+  refund                   String?   @db.VarChar(1)
+  currency                 String?
+  wallet_id                String?
+  status                   String?
+  payroll_id               String?
+  beneficiary_id           String?
+  plan_id                  String?   @db.Char(36)
+  transaction_date         DateTime  @default(now())
+
+  @@index([plan_id], map: "transactions_tb_plan_fk")
+  @@index([posted_user], map: "PuI")
+  @@index([fiat_id])
+  @@index([response_code], map: "RCI")
+  @@index([settlement_status], map: "SSi")
+  @@index([created], map: "cDai")
+  @@index([merchant_category], map: "mCI")
+  @@index([trans_type], map: "typeT")
+  @@index([customer_id], map: "transactions_tb_customer_fk")
+  @@index([user_id], map: "transactions_tb_user_id_fkey")
+  @@index([wallet_id], map: "transactions_tb_wallet_id_fkey")
+}
+
+model store_tb {
+  store_id      String  @id @default(uuid()) @db.Char(36)
+  user_id       String
+  store_name    String?
+  store_address String?
+  store_phone   String?
+  store_email   String?
+  store_account String?
+}
+
+model fiat_wallet {
+  wallet_id       String      @id @default(uuid()) @db.Char(36)
+  user_id         String
+  transaction_id  String?
+  currency_id     Int         @unique
+  account_number  String?     @unique
+  currency        String?
+  bank_name       String?
+  initial_balance Decimal?    @db.Decimal(18, 4)
+  current_balance Decimal?    @db.Decimal(18, 4)
+  created         DateTime    @default(now())
+  account_status  Int?
+  channel         String?     @db.VarChar(16)
+  channel_id      String?     @db.VarChar(72)
+  full_name       String?     @db.VarChar(64)
+  status          String?     @db.VarChar(1)
+  currency_tb     currency_tb @relation(fields: [currency_id], references: [currency_id], onDelete: NoAction, onUpdate: NoAction, map: "currency_id")
+
+  @@index([user_id], map: "wallet_user_id_fkey")
+}
+
+model currency_tb {
+  currency_id     Int          @id @unique(map: "currency_id")
+  code            String?      @db.VarChar(10)
+  name            String?      @db.VarChar(225)
+  country         String?      @db.VarChar(225)
+  country_logo    String       @db.VarChar(225)
+  currency_symbol String       @db.VarChar(225)
+  country_id      String?
+  fiat_wallet_tb  fiat_wallet?
+}
