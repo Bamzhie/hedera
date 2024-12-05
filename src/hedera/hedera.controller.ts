@@ -51,4 +51,11 @@ export class HederaController {
       data: details,
     };
   }
+
+  @Post('deploy')
+  async deploySmartContract() {
+    console.log('started deploy smart contract');
+    const result = await this.hederaService.smartContract();
+    return result;
+  }
 }

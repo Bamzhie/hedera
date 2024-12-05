@@ -19,8 +19,6 @@ export class EnvironmentCheckService implements OnModuleInit {
       'Starting environment checks during application initialization...',
     );
     try {
-      await this.checkGitRemote();
-      await this.checkGitVersion();
       await this.checkNodeVersion();
       await this.checkNpmVersion();
       await this.checkDependencies();

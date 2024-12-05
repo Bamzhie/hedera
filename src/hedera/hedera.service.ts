@@ -15,6 +15,10 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { HDNode as EthersHdNode } from '@ethersproject/hdnode';
 import axios from 'axios';
+import { JsonRpcProvider } from '@ethersproject/providers';
+import { Wallet } from '@ethersproject/wallet';
+import { ContractFactory } from '@ethersproject/contracts';
+import * as fs from 'node:fs/promises';
 
 @Injectable()
 export class HederaService {
@@ -122,7 +126,7 @@ export class HederaService {
       this.client = Client.forTestnet();
       this.client.setOperator(myAccountId, myPrivateKey);
       this.client.setDefaultMaxTransactionFee(new Hbar(100));
-      this.client.setDefaultMaxQueryPayment(new Hbar(50));
+      this.client.setMaxQueryPayment(new Hbar(50));
 
       console.log('Hedera environment setup complete');
     } catch (error) {
@@ -356,5 +360,79 @@ export class HederaService {
 
   private delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async smartContract() {
+    const rpcUrl = this.config.get<string>('RPC_URL');
+    const accountId = this.config.get<string>('ACCOUNT_ID');
+    const accountKey = this.config.get<string>('ACCOUNT_PRIVATE_KEY');
+
+    // initialise account
+    const rpcProvider = new JsonRpcProvider(rpcUrl);
+    const accountWallet = new Wallet(accountKey, rpcProvider);
+    const accountAddress = accountWallet.address;
+    const accountExplorerUrl = `https://hashscan.io/testnet/address/${accountAddress}`;
+
+    // deploy smart contract
+    const abi = await fs.readFile(
+      '/home/bamzhie/Documents/yada/yada_1/src/hedera/my_contract_sol_MyContract.abi',
+      {
+        encoding: 'utf8',
+      },
+    );
+    const evmBytecode = await fs.readFile(
+      'src/hedera/my_contract_sol_MyContract.bin',
+      {
+        encoding: 'utf8',
+      },
+    );
+    // NOTE: Prepare smart contract for deployment
+    // Step (2) in the accompanying tutorial
+    const myContractFactory = new ContractFactory(
+      abi,
+      evmBytecode,
+      accountWallet,
+    );
+    const myContract = await myContractFactory.deploy();
+    await myContract.deployTransaction.wait();
+    const myContractAddress = myContract.address;
+    const myContractExplorerUrl = `https://hashscan.io/testnet/address/${myContractAddress}`;
+
+    // write data to smart contract
+    // NOTE: Invoke a smart contract transaction
+    // Step (3) in the accompanying tutorial
+    const myContractWriteTxRequest =
+      await myContract.functions.introduce('bamzhie');
+    const myContractWriteTxReceipt = await myContractWriteTxRequest.wait();
+    const myContractWriteTxHash = myContractWriteTxReceipt.transactionHash;
+    const myContractWriteTxExplorerUrl = `https://hashscan.io/testnet/transaction/${myContractWriteTxHash}`;
+
+    // read data from smart contract
+    // NOTE: Invoke a smart contract query
+    // Step (4) in the accompanying tutorial
+    const [myContractQueryResult] = await myContract.functions.greet();
+
+    // output results
+    console.log(`accountId: ${accountId}`);
+    console.log(`accountAddress: ${accountAddress}`);
+    console.log(`accountExplorerUrl: ${accountExplorerUrl}`);
+    console.log(`myContractAddress: ${myContractAddress}`);
+    console.log(`myContractExplorerUrl: ${myContractExplorerUrl}`);
+    console.log(`myContractWriteTxHash: ${myContractWriteTxHash}`);
+    console.log(
+      `myContractWriteTxExplorerUrl: ${myContractWriteTxExplorerUrl}`,
+    );
+    console.log(`myContractQueryResult: ${myContractQueryResult}`);
+
+    return {
+      accountId,
+      accountAddress,
+      accountExplorerUrl,
+      myContractAddress,
+      myContractExplorerUrl,
+      myContractWriteTxHash,
+      myContractWriteTxExplorerUrl,
+      myContractQueryResult,
+    };
   }
 }
